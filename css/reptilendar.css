@@ -1,0 +1,314 @@
+
+/* ============== Body of calendar ============== */
+table.reptilendar {
+    height:100%;
+    width:100%;
+    font-family: Tahoma;
+    font-size: 11px;
+    font-family: Tahoma;
+    font-size: 11px;
+    background-color:#C1B4A7;
+    color: #777;
+}
+
+table.reptilendar thead {
+    width:100%;
+    background-color:#F7F7F7;
+    text-align: center;
+    color: #716356;
+    font-weight: bold;
+}
+
+table.reptilendar thead th { }
+
+table.reptilendar tbody td {
+    vertical-align:top;
+    background-color:#FFFFFF;
+}
+
+
+
+
+
+/* ============== Navigations panel ============== */
+table.reptilendar .reptilendar-nav {
+    clear:both;
+    height:24px;
+    padding:5px 10px 0 10px;
+    background-color: #716457;
+    color: #FFF;
+}
+
+table.reptilendar .reptilendar-nav div {
+    float: right;
+}
+
+table.reptilendar .reptilendar-nav div.current-title {
+    font-size: 14px;
+    text-align: left !important;
+}
+
+table.reptilendar .reptilendar-nav div.nav-btn {
+    margin-left:3px;
+    margin-right:3px;
+    width: 20px;
+    height:20px;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-image: url('./reptilendar_arrows.png')
+}
+table.reptilendar .reptilendar-nav div.nav-btn:hover { }
+
+table.reptilendar .reptilendar-nav div.nav-btn.prev-year  { background-position: 0 0; }
+table.reptilendar .reptilendar-nav div.nav-btn.prev-month { background-position: 0 -20px; }
+table.reptilendar .reptilendar-nav div.nav-btn.curr-month { background-position: 0 -40px; }
+table.reptilendar .reptilendar-nav div.nav-btn.next-month { background-position: 0 -60px; }
+table.reptilendar .reptilendar-nav div.nav-btn.next-year  { background-position: 0 -80px; }
+
+
+
+
+
+/* ============== Date cells ============== */
+table.reptilendar .day {
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+table.reptilendar .day:hover { border:1px solid #AAA !important; }
+
+table.reptilendar .day.in-month {
+    border:1px solid #FFF;
+    background-color:#FFF;
+    color: #F33;
+}
+table.reptilendar .day.out-month {
+    border:1px solid #F0EBD7;
+    background-color:#F0EBD7;
+    color: #AAA;
+}
+
+table.reptilendar .day div.date {
+    padding-right: 2px;
+    text-align: right;
+    font-size: 15px;
+    color: #BBB;
+    background-repeat: no-repeat;
+    background-position: 4px 4px;
+    background-image: none;
+}
+table.reptilendar .day div.date.hovered { background-image: url('./reptilendar_event_actions.png'); }
+
+table.reptilendar .day.today div.date {
+    color: #111 !important;
+}
+
+
+table.reptilendar .day div.event {
+    margin: 2px;
+    text-align: center;
+    font-size:9px;
+    color: #333;
+    float:left;
+    overflow: hidden;
+    background-color: #F9F9F9;
+    border:1px solid #E5E5E5;
+    width: 32px;
+    height: 32px;
+}
+table.reptilendar .day.out-month div.event {
+    background-color: #E9E9E9;
+    border:1px solid #D5D5D5;
+}
+table.reptilendar .day div.event:hover {
+    color: #1CBFE8;
+    border:1px solid #1CBFE8;
+    margin:2px;
+}
+
+table.reptilendar .day div.event > div { padding: 4px; background-repeat: no-repeat; background-position: left top; }
+table.reptilendar .day div.event > div.wait { background-image: url('./reptilendar_wait.png'); }
+table.reptilendar .day div.event > div.cancel { background-image: url('./reptilendar_cancel.png'); }
+table.reptilendar .day div.event > div.fin { background-image: url('./reptilendar_fin.png'); }
+
+
+div.reptilendar-event-drag-indicator {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+    display: none;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-image: url('./reptilendar_event_drag.png');
+}
+
+
+
+/* ============== Event hint windows ============== */
+div.reptilendar-event-hint-window {
+    display: none;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+    background-color: #F9F9F9;
+    border:1px solid #999;
+    padding:4px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    color: #777;
+    font-size: 12px;
+}
+
+
+
+
+/* ============== Event-Form Windows ============== */
+div.reptilendar-event-form-overlay {
+    position: fixed;
+    z-index: 10000;
+    opacity: 0.5;
+    top: 0px;
+    left: 0px;
+    height:100%;
+    width:100%;
+    background: #fff;
+    display: none;
+}
+
+div.reptilendar-event-form {
+    position: fixed;
+    display:none;
+    z-index: 11000;
+    left: 50%;
+    top: 200px;
+    /*width: 360px;*/
+    padding-bottom: 2px;
+    background: #FFF;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", sans-serif;
+    color: #777;
+    border: 1px solid #AAA;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.3);
+}
+
+
+div.reptilendar-event-form div.header {
+    background-color:#DDD;
+    padding: 8px 8px 6px 8px;
+    border-bottom: 1px solid #AAA;
+    border-top-left-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -webkit-border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-top-right-radius: 5px;
+}
+
+.reptilendar-event-form div.header span.title {
+    color: #555;
+    font-size: 13px;
+    margin: 0;
+}
+
+.reptilendar-event-form div.header span.close_button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    cursor: pointer;
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-image: url('./reptilendar_event_actions.png');
+    background-position: 0 -16px;
+    background-repeat: no-repeat;
+    z-index: 2;
+}
+
+.reptilendar-event-form div.body {
+    padding:12px;
+    padding-top: 4px;
+    font-size: 12px;
+    color: #555;
+}
+.reptilendar-event-form div.body div.form {
+    padding-bottom: 10px;
+    border-bottom:1px solid #DDD;
+    display: block;
+}
+
+.reptilendar-event-form div.body label {
+    display: inline-block;
+    width: 84px;
+    padding-top: 6px;
+    text-align: left;
+    font-size: 12px;
+    margin: 0;
+}
+
+.reptilendar-event-form div.body div.form input,
+.reptilendar-event-form div.body div.form select,
+.reptilendar-event-form div.body div.form textarea {
+    width: 224px;
+    margin: 3px;
+    padding: 2px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    font: 13px Arial;
+    background-color: #F9F9F9;
+    border: 1px solid #00C6FF;
+    color: #666677;
+    resize: none;
+}
+
+
+.reptilendar-event-form div.button {
+     display: block;
+    font-size: 11px;
+    font-weight: bold;
+    margin: 10px;
+    padding: 3px;
+    text-align: center;
+    width: 70px;
+    border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    text-align: center;
+    background-color: #F3F3F3;
+    cursor: pointer;
+}
+.reptilendar-event-form div.button:hover { background-color: #F7F7F7; }
+.reptilendar-event-form div.button.submit-button {
+    float: right;
+    margin-right: 0;
+    border: 1px solid #09C3F1;
+    color: #0CAFD8; }
+.reptilendar-event-form div.button.submit-button:hover { border: 1px solid #078DAF; color:#078DAF; }
+
+.reptilendar-event-form div.button.remove-button {
+    float: left;
+    margin-left: 0;
+    border: 1px solid #800000;
+    color: #800000;
+}
+.reptilendar-event-form div.button.remove-button:hover { float: left; border: 1px solid #600000; color: #600000; }
+
+.reptilendar-event-form div.button.progress {
+    background-image: url('./loading.gif') !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    color: #DDD !important;
+}
+
+
+

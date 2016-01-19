@@ -1,0 +1,353 @@
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+<link rel="stylesheet" type="text/css" href="./css/reptilendar.css" />
+<link rel="stylesheet" type="text/css" href="../css/styles.css" />
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.1.js"></script>
+<script type="text/javascript" src="./reptilendar.js"></script>
+<script type="text/javascript">
+
+$(document).ready( function(){
+
+    var rc = $('div#calendar-body').reptilendar({
+    	event	: {
+            get_url  	: './server/get.php',
+            add_url	 	: './server/add.php',
+            update_url	: './server/update.php',
+            remove_url	: './server/remove.php',
+            move_url 	: './server/move.php',
+            params	: {},
+            view    : $('#r-view'),
+			hint    : $('#r-hint'),
+			addForm : $('#r-form'),
+			updForm : $('#r-form'),
+		},
+        callback: {
+            onEventsLoad	: function( items ) { out('<b>[onEventsLoad]:</b><br>Items:<br>'+print_r(items)); },
+            onEventAdd		: function( item ) { out('<b>[onEventAdd]:</b><br>'+print_r(item)); },
+            onEventUpdate	: function( item ) { out('<b>[onEventUpdate]:</b><br>'+print_r(item)); },
+            onEventRemove	: function( item ) { out('<b>[onEventRemove]:</b><br>'+print_r(item)); },
+            onEventMove		: function( item ) { out('<b>[onEventMove]:</b><br>'+print_r(item)); },
+            onError			: function( message) { out('Event [onError]: '+message); }
+        },
+        autoload: true
+    });
+
+    $('button#clear').on('click', function() { $('div#output').empty(); });
+	$('button#get_events').on('click', function() { rc.loadEvents( {} ); });
+	$('button#clr_events_wait').on('click', function() { rc.clearEvents( { field:'state', value:'wait' } ); });
+	$('button#clr_events_all').on('click', function() { rc.clearEvents(); });
+
+});
+
+function out( message ) {
+	$('div#output').append('<div>&gt;&gt; '+message+'<br></div>')
+				   .scrollTop( $('div#output')[0].scrollHeight );
+};
+
+function print_r(arr, level) {
+    var print_red_text = "";
+    if(!level) level = 0;
+    var level_padding = "";
+    for(var j=0; j<level+1; j++) level_padding += "&nbsp;&nbsp;&nbsp;&nbsp;";
+    if(typeof(arr) == 'object') {
+        for(var item in arr) {
+            var value = arr[item];
+            if(typeof(value) == 'object') {
+                print_red_text += level_padding + "'" + item + "'&nbsp;:<br>";
+                print_red_text += print_r(value,level+1);
+			}
+            else { print_red_text += level_padding + "'" + item + "'&nbsp;=>&nbsp;\"" + value + "\"<br>"; }
+        }
+    }
+
+    else  print_red_text = "===>"+arr+"<===("+typeof(arr)+")";
+    return print_red_text;
+};
+
+</script>
+
+<style type="text/css">
+  body { background-color:#F5F5F5; font-size: 12px; font-family: Tahoma; color: #555; margin: 24px; }
+  .section { background: none repeat scroll 0 0 #FFFFFF; box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1); margin-bottom: 27px; padding: 20px; line-height: 18px; }
+  ul.section { padding-left: 32px; }
+  .section-title { font-size: 20px;line-height: 22px;margin-bottom: 10px;margin-top: 10px;font-weight: normal;}
+  .in-section-title {font-size: 18px;line-height: 20px;margin-bottom: 8px;font-weight: normal;}
+  pre {background-color: #FAFAFA;border: 1px solid #CCCCCC;color: #000000;font-size: 11px;padding: 4px;}
+  a {color: #006096;text-decoration:none;font-weight: bold; }
+  a:hover { text-decaration: underline; }
+  .definition { display: inline-block; font-family: monospace;font-size: 15px;color: #0070A6;}
+  .typization { margin-left: 30px; font-style: italic; }
+  .description {display:block;margin-bottom: 20px; margin-left: 10px;}
+</style>
+
+
+<head>
+<title>Reptilendar</title>
+</head>
+<body>
+<style type="text/css">
+	table.reptilendar .day div.event > div { padding: 4px; background-repeat: no-repeat; background-position: left top; }
+	div.state_wait 		{ background-image: url('./img/state_wait.png'); }
+	div.state_cancel 	{ background-image: url('./img/state_cancel.png'); }
+	div.state_done 		{ background-image: url('./img/state_done.png'); }
+
+	button {
+		border:1px solid #aaa;
+		background-color: #E5E5E5;
+		padding: 4px;
+		margin:4px;
+		color: #555;
+		width: 120px;
+		font-size:11px;
+		cursor:pointer; *cursor:hand;
+		border-radius: 4px;
+	}
+	button:hover {
+		background-color: #F7F7F7;
+		border:1px solid #ccc;
+		color: #222;
+	}
+</style>
+<div class="section-title">Reptilendar demo</div>
+<div class="section">
+
+	<div id="calendar" style="float:left; width:640px; height:420px;">
+		<div id="calendar-body"></div>
+	</div>
+
+	<div style="float:left; margin-left:20px;">
+		<button id="get_events">Fetch events</button><br>
+		<button id="clr_events_wait">Erase [wait] events</button><br>
+		<button id="clr_events_all">Erase all events</button>
+    	<br><br>
+    	<button id="clear" style="float:right;">Clear output</button>
+	</div>
+
+	<div id="output" style="border:1px solid #CFCFCF; float:left; overflow:auto; font-size:10px; margin-left:20px; line-height:11px; width:500px; height:420px;">output..</div>
+
+	<div style="clear:both;"></div>
+
+
+	<div id="r-view" style="display:none;"><div class="state_{state}"><img src="./img/{type}.png" width="16" /><br><nobr>{name}</nobr></div></div>
+	<div id="r-hint" style="display: none; font-size:11px;">
+		<b style="display:inline-block; width:40px;">ID:</b> {id}<br>
+		<b style="display:inline-block; width:40px;">Date:</b> {date}<br>
+		<b style="display:inline-block; width:40px;">Name:</b> {name}<br>
+		<b style="display:inline-block; width:40px;">State:</b> {state}<br>
+		<b style="display:inline-block; width:40px;">Type:</b> {type}<br>
+	</div>
+	<div id="r-form" style="display:none;">
+		<label>Name:</label>
+		<input type="text" name="name"><br>
+		<label>Type:</label>
+		<select name="type">
+			<option value="bug">bug</options>
+			<option value="idea">idea</options>
+			<option value="safe">safe</options>
+			<option value="tool">tool</options>
+		</select><br>
+		<label>State:</label>
+		<select name="state">
+			<option value="wait">wait</options>
+			<option value="done">done</options>
+			<option value="cancel">cancel</options>
+		</select>
+	</div>
+
+</div>
+
+<div class="section-title">Features</div>
+<ul class="section">
+    <li>Month calendars with events</li>
+    <li>BuildIn form to events modify</li>
+    <li>Custom mapping for views</li>
+    <li>On events callback functions support</li>
+    <li>Autoload event on init</li>
+    <li>Drag and Drop support</li>
+    <li>Obligatory fields [id, date] in event structure</li>
+</ul>
+
+<div class="section-title">Getting started</div>
+<div class="section">
+	<div class="in-section-title">Insert in head</div>
+	<pre>&lt;!-- basic style --&gt;
+&lt;link rel="stylesheet" type="text/css" href="your_path/css/reptilendar.css" /&gt;
+&lt;!-- required javascripts --&gt;
+&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="your_path/js/reptilendar.js"&gt;&lt;/script&gt;</pre>
+	<div class="in-section-title">Insert in body</div>
+	<pre>&lt;div id="calendar" style="width:640px; height:420px;"&gt;
+	&lt;div id="calendar-body"&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div id="r-view" style="display:none;"&gt;{name}&lt;/div&gt;
+&lt;div id="r-hint" style="display: none;"&gt;#{id}&lt;br&gt;{name}&lt;/div&gt;
+&lt;div id="r-form" style="display:none;"&gt;
+	&lt;label&gt;Name:&lt;/label&gt;
+	&lt;input type="text" name="<b style="color:red;">name</b>">&lt;br&gt;
+	&lt;label&gt;Type:&lt;/label&gt;
+	&lt;select name="<b style="color:red;">type</b>"&gt;
+		&lt;option value="bug"&gt;bug&lt;/options&gt;
+		&lt;option value="idea"&gt;idea&lt;/options&gt;
+		&lt;option value="safe"&gt;safe&lt;/options&gt;
+		&lt;option value="tool"&gt;tool&lt;/options&gt;
+	&lt;/select>&lt;br>
+	&lt;label&gt;State:&lt;/label&gt;
+	&lt;select name="<b style="color:red;">state</b>"&gt;
+		&lt;option value="wait"&gt;wait&lt;/options&gt;
+		&lt;option value="done"&gt;done&lt;/options&gt;
+		&lt;option value="cancel"&gt;cancel&lt;/options&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+
+&lt;script type="text/javascript"&gt;
+$(document).ready( function(){
+    var rc = $('div#calendar-body').reptilendar({
+    	event	: {
+			get_url		: './server/get.php',
+			add_url		: './server/add.php',
+			update_url	: './server/update.php',
+			remove_url	: './server/remove.php',
+			move_url	: './server/move.php',
+			params		: {},
+			view		: $('#r-view'),
+			hint		: $('#r-hint'),
+			addForm		: $('#r-form'),
+			updForm		: $('#r-form'),
+		}
+    });
+});
+&lt;/script&gt;</pre>
+
+</div>
+
+
+<div class="section-title">Responses from server</div>
+<div class="section">
+	<div class="in-section-title">on Load</div>
+	<pre>{
+  success: true/false, // error indicator
+  message: 'your message here', // successfull or error message
+  data: [ // array of items
+    {id:1,date:'YYYY-MM-DD', ..},
+    {id:2,date:'YYYY-MM-DD', ..},
+    {id:3,date:'YYYY-MM-DD', ..},
+    ..
+  ]
+}</pre>
+	<div class="in-section-title">on Add</div>
+	<pre>{
+  success: true/false, // error indicator
+  message: 'your message here', // successfull or error message
+  data: {id:N,date:'YYYY-MM-DD', ..} // added event full object
+}</pre>
+	<div class="in-section-title">on Update</div>
+	<pre>{
+  success: true/false, // error indicator
+  message: 'your message here', // successfull or error message
+  data: {id:N,date:'YYYY-MM-DD', ..} // updated event full object
+}</pre>
+	<div class="in-section-title">on Move</div>
+	<pre>{
+  success: true/false, // error indicator
+  message: 'your message here', // successfull or error message
+  data: { id:N,date:'YYYY-MM-DD' } // moved event main fields
+}</pre>
+	<div class="in-section-title">on Remove</div>
+	<pre>{
+  success: true/false, // error indicator
+  message: 'your message here', // successfull or error message
+  data: N // removed event ID
+}</pre>
+</div>
+
+<div class="section-title">Documentation</div>
+<div class="section">
+
+	<div class="in-section-title">Options</div>
+	<span class="definition">now</span><span class="typization">Type: object, Default: current month and year</span>
+	<span class="description">Visible month and year on initialization. Contents such fields:<br>
+	  month,<br>
+	  year
+	</span>
+	<span class="definition">locale</span><span class="typization">Type: object, Default: english locale</span>
+	<span class="description">Translated phrases</span>
+	<span class="definition">locale.buttons</span><span class="typization">Type: object, Default: english locale</span>
+	<span class="description">Translations for buttons. Contents such fields:<br>
+	  prev_year		: "Previous year",<br>
+	  prev_month  	: "Previous month",<br>
+	  today       	: "Today",<br>
+	  next_month  	: "Next month",<br>
+	  next_year   	: "Next year",<br>
+	  create_event	: "Create",<br>
+	  modify_event	: "Save",<br>
+	  remove_event	: "Remove"
+	</span>
+	<span class="definition">locale.captions</span><span class="typization">Type: object, Default: english locale</span>
+	<span class="description">Translations for windows captions. Contents such fields:<br>
+      create_event	: "Create a new event",<br>
+	  modify_event	: "Update event"
+	</span>
+    <span class="definition">locale.days</span><span class="typization">Type: array, Default: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Sunday"]</span>
+    <span class="description">Translations for weekdays</span>
+    <span class="definition">locale.months</span><span class="typization">Type: array, Default: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]</span>
+    <span class="description">Translations for month names</span>
+    <span class="definition">locale.error</span><span class="typization">Type: string, Default: "Server error"</span>
+    <span class="description">Translations for undefined server error</span>
+	<span class="definition">event</span><span class="typization">Type: object, Default: {}</span>
+	<span class="description">Parameters for events handle</span>
+	<span class="definition">event.get_url</span><span class="typization">Type: string, Default: "./"</span>
+	<span class="description">Url for request to fetch events from server</span>
+	<span class="definition">event.add_url</span><span class="typization">Type: string, Default: "./add"</span>
+	<span class="description">Url for request to add new event</span>
+	<span class="definition">event.update_url</span><span class="typization">Type: string, Default: "./update"</span>
+	<span class="description">Url for request to update exists event</span>
+	<span class="definition">event.remove_url</span><span class="typization">Type: string, Default: "./remove"</span>
+	<span class="description">Url for request to remove event</span>
+	<span class="definition">event.move_url</span><span class="typization">Type: string, Default: "./move"</span>
+	<span class="description">Url for request to move events to other date</span>
+	<span class="definition">event.params</span><span class="typization">Type: object, Default: {}</span>
+	<span class="description">Additional parameter for request to server</span>
+	<span class="definition">event.view</span><span class="typization">Type: jquery-object / string, Default: "{id}"</span>
+	<span class="description">Template for event imaging in calendar</span>
+	<span class="definition">event.hint</span><span class="typization">Type: jquery-object / string, Default: null</span>
+	<span class="description">Template to display additional information in popup window on event hover</span>
+	<span class="definition">event.addForm</span><span class="typization">Type: jquery-object / string, Default: " "</span>
+	<span class="description">Template for form in window for add new event</span>
+	<span class="definition">event.updForm</span><span class="typization">Type: jquery-object / string, Default: " "</span>
+	<span class="description">Template for form in window for modify event</span>
+	<span class="definition">callback</span><span class="typization">Type: object, Default: {}</span>
+	<span class="description">Callback function on events called, details see in section "Events"</span>
+	<span class="definition">autoload</span><span class="typization">Type: boolean, Default: true</span>
+	<span class="description">Load events from server on calendar init and dates change</span>
+
+	<div class="in-section-title">Methods</div>
+	<span class="definition">object.loadEvents( params )</span><span class="typization">Argument: object</span>
+	<span class="description">Fetch event from server. Argument params is additional object to send in request</span>
+	<span class="definition">object.clearEvents( condition )</span><span class="typization">Argument: object / null</span>
+	<span class="description">Erase events from calendar. If condition is null or false - erase all events.<br>
+	If condition is object in format {field:'?', value:'?'}, then erase only events with this value in defined field</span>
+
+	<div class="in-section-title">Events</div>
+	<span class="definition">callback.onEventsLoad( items: array_of_objects )</span>
+	<span class="description">Triggered when events are loaded from server. Contains all events.</span>
+	<span class="definition">callback.onEventMove( item: object )</span>
+	<span class="description">Triggered when event is moved. Contents modified event.</span>
+	<span class="definition">callback.onEventAdd( item: object )</span>
+	<span class="description">Triggered when events is added. Contents added event.</span>
+	<span class="definition">callback.onEventUpdate( item: object )</span>
+	<span class="description">Triggered when event is moved. Contents modified event.</span>
+	<span class="definition">callback.onEventRemove( item: object )</span>
+	<span class="description">Triggered when event is removed. Contents removed event.</span>
+	<span class="definition">callback.onError( message: string )</span>
+	<span class="description">Triggered when except error with server communication</span>
+
+</div>
+
+
+</body>
+</html>
+
